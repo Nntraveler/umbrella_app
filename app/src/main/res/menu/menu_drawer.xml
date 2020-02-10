@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_item_location"
+            android:icon="@drawable/ic_nav_item_location"
+            android:title="@string/nav_item_text_location" />
+
+        <item
+            android:id="@+id/nav_item_friends"
+            android:icon="@drawable/ic_nav_item_friends"
+            android:title="@string/nav_item_text_friends" />
+
+        <item
+            android:id="@+id/nav_item_settings"
+            android:icon="@drawable/ic_nav_item_settings"
+            android:title="@string/nav_item_text_settings" />
+    </group>
+
+</menu>

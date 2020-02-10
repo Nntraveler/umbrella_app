@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".LockFragment">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        app:cardCornerRadius="10dp"
+        android:elevation="8dp" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary" >
+
+            <ImageButton
+                android:id="@+id/lock_frag_lock_imagebutton"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_weight="5"
+                style="?attr/borderlessButtonStyle"
+                android:src="@mipmap/ic_scan_qrcode"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:text="扫码以使用"
+                android:textSize="24sp"
+                android:textColor="@color/windowBackground"
+                style="?attr/borderlessButtonStyle"
+                android:layout_marginBottom="5dp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_marginTop="60dp"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <EditText
+            android:id="@+id/lock_frag_id_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:hint="输入设备ID以使用"
+            android:textSize="20sp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="5dp"
+            android:elevation="8dp">
+
+            <Button
+                android:id="@+id/lock_frag_lock_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="关锁"
+                android:textSize="20sp"
+                android:textAlignment="center"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/windowBackground"/>
+
+        </androidx.cardview.widget.CardView>
+<!--        <Button-->
+<!--            android:id="@+id/lock_frag_lock_button"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="关锁"-->
+<!--            android:textSize="20sp"-->
+<!--            android:textColor="@color/windowBackground"-->
+<!--            android:background="@color/colorPrimary"-->
+<!--            android:textAlignment="center"-->
+<!--            app:cornerRadius="5dp"/>-->
+
+
+    </LinearLayout>
+
+</LinearLayout>
