@@ -26,6 +26,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 
     private Button lockButton;
 
+    //初始化fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    //设置button点击响应，若为二维码按键则开始扫码，若为关锁按键则关锁（仅做了UI效果）
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -56,6 +58,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         IntentIntegrator.forSupportFragment(this).initiateScan();
     }
 
+    //关锁函数先请求后将对应的设备ID保存到本地数据库
     private void lockDevice(String deviceIdToLock) {
         if (deviceAvailable(deviceIdToLock)) {
             //TODO:发送请求
@@ -65,18 +68,20 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    //TODO：检查设备是否可用
     private boolean deviceAvailable(String deviceIdToUnlock) {
         return true;
     }
 
+    //TODO：扫码结果处理逻辑
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() == null) {
-                //TODO:解析并发送请求
                 Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
             } else {
+                //TODO:解析并发送请求
                 Toast.makeText(getContext(), "Scanned: " + result.getContents(),
                         Toast.LENGTH_LONG).show();
             }
