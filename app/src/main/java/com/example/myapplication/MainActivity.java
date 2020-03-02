@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        checkDevices();
+        //checkDevices();
     }
 
     @Override
@@ -118,13 +118,13 @@ public class MainActivity extends AppCompatActivity {
     private void checkDevices() {
         LitePal.deleteAll(Device.class);
         Device device = new Device();
-        device.setDeviceId("1354651");
+        device.setDeviceMACaddress("1354651");
         device.save();
         device.clearSavedState();
-        device.setDeviceId("98465123");
+        device.setDeviceMACaddress("98465123");
         device.save();
         device.clearSavedState();
-        device.setDeviceId("saefhsdfn");
+        device.setDeviceMACaddress("saefhsdfn");
         device.save();
     }
 }

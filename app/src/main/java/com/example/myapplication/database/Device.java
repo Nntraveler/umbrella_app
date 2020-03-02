@@ -6,7 +6,7 @@ public class Device extends LitePalSupport {
 
     private int id;
 
-    private String deviceId;
+    private String deviceMACaddress;
 
     public int getId() {
         return id;
@@ -16,11 +16,11 @@ public class Device extends LitePalSupport {
         this.id = id;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    public String getDeviceMACaddress() {
+        return deviceMACaddress;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceMACaddress(String deviceMACaddress) {
+        this.deviceMACaddress = deviceMACaddress;
     }
 }
