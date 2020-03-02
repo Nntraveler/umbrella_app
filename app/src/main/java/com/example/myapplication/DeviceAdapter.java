@@ -20,10 +20,12 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
 
     private List<String> devicesIdList;
 
+    //此处为提供给devicefragment的接口，使其在点击某设备的关闭按钮后显示alertDialog以进行确认
     public static interface OnItemSwitchOffButtonClickeListener {
         public void onItemSwitchOffButtonClicked(String deviceId);
     }
 
+    //viewHolder
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView deviceIdText;
@@ -37,11 +39,13 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         }
     }
 
+    //初始化
     public DeviceAdapter(List<String> idList, DevicesFragment devicesFragment) {
         devicesIdList = idList;
         deviceFragment = devicesFragment;
     }
 
+    //舒适化界面
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -52,6 +56,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         return new ViewHolder(view);
     }
 
+    //当显示某个device时调用
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final String id = devicesIdList.get(position);

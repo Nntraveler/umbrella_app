@@ -24,3 +24,4 @@ public class Device extends LitePalSupport {
         this.deviceId = deviceId;
     }
 }
+

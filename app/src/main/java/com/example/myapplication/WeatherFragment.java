@@ -65,6 +65,7 @@ public class WeatherFragment extends Fragment {
 
     private Activity activity;
 
+    //fragment初始化
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -72,13 +73,14 @@ public class WeatherFragment extends Fragment {
         activity = getActivity();
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
         initAllProperty(view);
+        //检查本地是否有已存入的天气信息
         SharedPreferences prefs = activity.getSharedPreferences("weather",
                 Context.MODE_PRIVATE);
         String weatherNow = prefs.getString("WEATHER_NOW", null);
         String weatherForecast = prefs.getString("WEATHER_FORECAST", null);
         String weatherSuggestions = prefs.getString("WEATHER_SUGGESTIONS", null);
-
         String weatherId = prefs.getString("WEATHER_ID", null);
+        //若本地已有已存入的天气信息则直接加载界面
         if (weatherNow != null && weatherForecast != null && weatherSuggestions != null) {
             Utility.handleWeatherNow(weatherNow, weather);
             Utility.handleWeatherForecast(weatherForecast, weather);
@@ -86,7 +88,7 @@ public class WeatherFragment extends Fragment {
             showWeatherNow(weather);
             showWeatherForecast(weather.forecastList);
             showWeatherSuggestions(weather.suggestion);
-        } else if (weatherId != null) {
+        } else if (weatherId != null) { //若本地沒有已存入的天气信息，则依次查询
             if (weatherNow == null) {
                 requestWeatherNow(weatherId);
             }
@@ -100,6 +102,7 @@ public class WeatherFragment extends Fragment {
         return view;
     }
 
+    //初始化所有view
     private void initAllProperty(View view) {
         weatherLayout = view.findViewById(R.id.weather_frag_scroll_view);
         titleCity = view.findViewById(R.id.weather_frag_title_city);
@@ -116,11 +119,14 @@ public class WeatherFragment extends Fragment {
         sportText = view.findViewById(R.id.weather_suggestion_sport);
     }
 
+    //因和风天气api无法同时查询当前天气，天气预报和生活建议，所以需要分开查询，此处为查询当前天气
     public void requestWeatherNow(final String weatherId) {
         String weatherUrl =
                 "https://free-api.heweather.net/s6/weather/now?location=" + weatherId + "&key" +
                         "=1872edf195e5429f88b0c48e723f36b0";
+        //发送请求
         HttpUtil.sendOKHttpRequest(weatherUrl, new Callback() {
+            //若查询失败则提示
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
@@ -132,6 +138,7 @@ public class WeatherFragment extends Fragment {
                 });
             }
 
+            //若查询成功则通过sharedPreference保存到本地然后加载界面
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 final String responseText = response.body().string();
@@ -154,6 +161,7 @@ public class WeatherFragment extends Fragment {
         });
     }
 
+    //查询进三日天气预报，若失败则提示，若成功则保存到本地并加载界面
     public void requestWeatherForecast(final String weatherId) {
         String weatherUrl =
                 "https://free-api.heweather.net/s6/weather/forecast?location=" + weatherId +
@@ -192,6 +200,7 @@ public class WeatherFragment extends Fragment {
         });
     }
 
+    //查询生活建议，若失败则提示，若成功则保存到本地并加载界面
     public void requestWeatherSuggestions(final String weatherId) {
         String weatherUrl =
                 "https://free-api.heweather.net/s6/weather/lifestyle?location=" + weatherId +
@@ -230,6 +239,7 @@ public class WeatherFragment extends Fragment {
         });
     }
 
+    //以下三个函数仅作界面的加载
     private void showWeatherNow(Weather weatherInfo) {
         String cityName = weatherInfo.basic.cityName;
         String updateTime = weatherInfo.update.updateTime.split(" ")[1];
