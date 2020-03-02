@@ -27,6 +27,8 @@ import com.example.myapplication.database.Device;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import static android.app.Activity.RESULT_OK;
+
 public class LockFragment extends Fragment implements View.OnClickListener {
 
     private ImageButton scanQRcodeToLock;
@@ -98,7 +100,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-        IntentIntegrator.forSupportFragment(this).initiateScan();
+        scanQRcode();
         if(lockerMACAddress.isEmpty()){
             // 扫描失败
             msg("QRcode is not valid!");
@@ -191,6 +193,16 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    //TODO：扫码开锁逻辑
+    private void scanQRcode() {
+        IntentIntegrator integrator = IntentIntegrator.forSupportFragment(this);
+        integrator.setOrientationLocked(false);
+        integrator.initiateScan();
+//        Device device = new Device();
+//        device.setDeviceId("dsghklg");
+//        device.save();
+    }
+
     //TODO：检查设备是否可用
     private boolean deviceAvailable(String deviceIdToUnlock) {
         return true;
@@ -212,6 +224,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
                 lockerMACAddress = macAddress;
+
                 Toast.makeText(getContext(), "Scanned: " + result.getContents(),
                         Toast.LENGTH_LONG).show();
             }

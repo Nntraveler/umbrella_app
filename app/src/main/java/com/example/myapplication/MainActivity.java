@@ -23,6 +23,8 @@ import org.litepal.LitePal;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String KEY_CODE = "QRCODE";
+
     private DrawerLayout drawerLayout;
 
     private TextView toolbarTitle;
@@ -84,15 +86,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        //checkDevices();
+        bottomNavigationView.getMenu().getItem(0).setChecked(true);
+        toolbarTitle.setText("天气");
+        replaceFragment(new WeatherFragment());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        bottomNavigationView.getMenu().getItem(0).setChecked(true);
-        toolbarTitle.setText("天气");
-        replaceFragment(new WeatherFragment());
     }
 
     //设置点击home键显示左侧导航栏
