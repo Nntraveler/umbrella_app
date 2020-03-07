@@ -11,9 +11,4 @@
         android:icon="@drawable/ic_lock"
         android:title="lock" />
 
-    <item
-        android:id="@+id/nav_devices"
-        android:icon="@drawable/ic_devices"
-        android:title="devices" />
-
 </menu>

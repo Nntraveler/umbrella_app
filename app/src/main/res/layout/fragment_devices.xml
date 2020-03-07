@@ -1,14 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="50dp"
     tools:context=".DevicesFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/devices_frag_recycler_view"
-        android:layout_marginTop="10dp"
+    <androidx.cardview.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:cardCornerRadius="5dp">
 
-</FrameLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="40dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="设备ID："
+                    android:textAlignment="textStart"
+                    android:textSize="32sp"
+                    android:textColor="@color/windowBackground"/>
+
+                <TextView
+                    android:id="@+id/device_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textStart"
+                    android:textSize="14sp"
+                    android:text="1.234"
+                    android:textColor="@color/windowBackground" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button_switch_off"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                style="?attr/borderlessButtonStyle"
+                android:text="开锁"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textAlignment="textEnd" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

@@ -1,11 +1,10 @@
 <litepal>
     <dbname value="my_weather" />
-    <version value="2"/>
+    <version value="3"/>
 
     <list>
         <mapping class="com.example.myapplication.database.Province" />
         <mapping class="com.example.myapplication.database.City" />
         <mapping class="com.example.myapplication.database.County" />
-        <mapping class="com.example.myapplication.database.Device" />
     </list>
 </litepal>

@@ -21,7 +21,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import org.litepal.LitePal;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LockFragment.OnLockDeviceListener, DevicesFragment.OnDeviceSwitchOffButtonClickListener {
 
     public static final String KEY_CODE = "QRCODE";
 
@@ -32,6 +32,26 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
 
     private BottomNavigationView bottomNavigationView;
+
+    private String runningDeviceMACAddress;
+
+    public String getRunningDeviceMACAddress() {
+        return runningDeviceMACAddress;
+    }
+
+    public void setRunningDeviceMACAddress(String runningDeviceMACAddress) {
+        this.runningDeviceMACAddress = runningDeviceMACAddress;
+    }
+
+    public void onDeviceSwitchOffButtonClick() {
+        setRunningDeviceMACAddress("");
+        replaceFragment(new LockFragment());
+    }
+
+    public void onLockDeviceButtonClicked(String deviceMACAddress) {
+        setRunningDeviceMACAddress(deviceMACAddress);
+        replaceFragment(new DevicesFragment());
+    }
 
     //初始化主界面
     @Override
@@ -75,12 +95,13 @@ public class MainActivity extends AppCompatActivity {
                         replaceFragment(new WeatherFragment());
                         break;
                     case R.id.nav_lock:
-                        toolbarTitle.setText("关锁");
-                        replaceFragment(new LockFragment());
-                        break;
-                    case R.id.nav_devices:
-                        toolbarTitle.setText("设备");
-                        replaceFragment(new DevicesFragment());
+                        if (checkDeviceInUse()) {
+                            toolbarTitle.setText("设备");
+                            replaceFragment(new DevicesFragment());
+                        } else {
+                            toolbarTitle.setText("关锁");
+                            replaceFragment(new LockFragment());
+                        }
                         break;
                 }
                 return true;
@@ -89,6 +110,11 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.getMenu().getItem(0).setChecked(true);
         toolbarTitle.setText("天气");
         replaceFragment(new WeatherFragment());
+    }
+
+    private boolean checkDeviceInUse() {
+        runningDeviceMACAddress = getSharedPreferences("device", MODE_PRIVATE).getString("RUNNING_DEVICE_MAC_ADDRESS", null);
+        return !(runningDeviceMACAddress == null || runningDeviceMACAddress.isEmpty());
     }
 
     @Override

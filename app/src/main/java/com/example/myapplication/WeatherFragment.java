@@ -144,7 +144,7 @@ public class WeatherFragment extends Fragment {
                 final String responseText = response.body().string();
                 Utility.handleWeatherNow(responseText, weather);
                 SharedPreferences.Editor editor = activity.getSharedPreferences(
-                        "weather", Context.MODE_MULTI_PROCESS).edit();
+                        "weather", Context.MODE_PRIVATE).edit();
                 editor.putString("WEATHER_NOW", responseText);
                 editor.apply();
                 activity.runOnUiThread(new Runnable() {
@@ -182,7 +182,7 @@ public class WeatherFragment extends Fragment {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 final String responseText = response.body().string();
                 SharedPreferences.Editor editor = activity.getSharedPreferences(
-                        "weather", Context.MODE_MULTI_PROCESS).edit();
+                        "weather", Context.MODE_PRIVATE).edit();
                 editor.putString("WEATHER_FORECAST", responseText);
                 editor.apply();
                 Utility.handleWeatherForecast(responseText, weather);
@@ -222,7 +222,7 @@ public class WeatherFragment extends Fragment {
                 final String responseText = response.body().string();
                 Utility.handleWeatherSuggestions(responseText, weather);
                 SharedPreferences.Editor editor = activity.getSharedPreferences(
-                        "weather", Context.MODE_MULTI_PROCESS).edit();
+                        "weather", Context.MODE_PRIVATE).edit();
                 editor.putString("WEATHER_SUGGESTIONS", responseText);
                 editor.apply();
                 activity.runOnUiThread(new Runnable() {

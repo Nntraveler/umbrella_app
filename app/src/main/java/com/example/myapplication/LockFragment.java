@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -21,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.database.Device;
@@ -39,9 +43,11 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 
     private String deviceName;
 
-    private EditText deviceId;
+    private TextView deviceId;
 
     private Button lockButton;
+
+    private MainActivity mainActivity;
 
     private static final int REQUEST_ENABLE_BT = 2;
 
@@ -55,11 +61,16 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lock, container, false);
+        mainActivity = (MainActivity) getActivity();
         scanQRcodeToLock = view.findViewById(R.id.lock_frag_lock_imagebutton);
         deviceId = view.findViewById(R.id.lock_frag_id_text);
         lockButton = view.findViewById(R.id.lock_frag_lock_button);
         scanQRcodeToLock.setOnClickListener(this);
         lockButton.setOnClickListener(this);
+        deviceName = mainActivity.getRunningDeviceMACAddress();
+        if (deviceName != null && !deviceName.isEmpty()) {
+            deviceId.setText(deviceName);
+        }
         return view;
     }
 
@@ -187,16 +198,21 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
+    public static interface OnLockDeviceListener {
+        public void onLockDeviceButtonClicked(String deviceMACAddress);
+    }
 
     //关锁函数先请求后将对应的设备ID保存到本地数据库
     private void lockDevice() {
+        if (deviceName == null || deviceName.isEmpty())
+            return;
         sendSignal("2");
-        Device device = new Device();
-        device.setDeviceName(deviceName);
-        device.save();
+        SharedPreferences.Editor editor = mainActivity.getSharedPreferences("device", Context.MODE_PRIVATE).edit();
+        editor.putString("RUNNING_DEVICE_MAC_ADDRESS", deviceName);
+        editor.apply();
         msg("Close locker!");
         Disconnect();
+        mainActivity.onLockDeviceButtonClicked(deviceName);
     }
 
     private void scanQRcode() {
