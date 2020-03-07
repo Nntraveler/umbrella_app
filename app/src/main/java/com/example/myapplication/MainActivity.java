@@ -119,13 +119,13 @@ public class MainActivity extends AppCompatActivity {
     private void checkDevices() {
         LitePal.deleteAll(Device.class);
         Device device = new Device();
-        device.setDeviceMACaddress("1354651");
+        device.setDeviceName("1354651");
         device.save();
         device.clearSavedState();
-        device.setDeviceMACaddress("98465123");
+        device.setDeviceName("98465123");
         device.save();
         device.clearSavedState();
-        device.setDeviceMACaddress("saefhsdfn");
+        device.setDeviceName("saefhsdfn");
         device.save();
     }
 }

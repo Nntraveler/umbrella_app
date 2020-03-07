@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -25,6 +26,7 @@ import org.litepal.LitePal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -38,9 +40,13 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
 
     private BluetoothSocket btSocket = null;
 
+    private BluetoothAdapter myBluetooth;
+
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private Boolean isConnected = false;
+
+    private static final int REQUEST_ENABLE_BT = 2;
 
     //舒适化界面
     @Override
@@ -67,7 +73,7 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
     private void initDevicesIdList() {
         List<Device> devices = LitePal.findAll(Device.class);
         for (int i = 0; i < devices.size(); ++i) {
-            devicesIdList.add(devices.get(i).getDeviceMACaddress());
+            devicesIdList.add(devices.get(i).getDeviceName());
         }
     }
 
@@ -92,19 +98,45 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
     }
 
     //TODO：开锁逻辑，先开锁，后将本地数据库内的对应的设备删除
-    private void unlockDevice(String deviceIdToUnlock) {
+    private void unlockDevice(String lockerName) {
 
         //TODO:向服务器发送开锁请求
-        new ConnectBT(deviceIdToUnlock).execute();
+        myBluetooth = BluetoothAdapter.getDefaultAdapter();
+        if(myBluetooth == null) {
+            //设备不支持蓝牙 报错
+            return;
+        }
+        if(!myBluetooth.isEnabled()){
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+        Set<BluetoothDevice> pairedDevices = myBluetooth.getBondedDevices();
+        String deviceHardwareAddress = "";
+        if (pairedDevices.size() > 0) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                if(deviceName.equals(lockerName)) {
+                    deviceHardwareAddress = device.getAddress(); // MAC address
+                    break;
+                }
+            }
+        }
+        if(deviceHardwareAddress.isEmpty()){
+            msg("Can't find the device! ");
+            return;
+        }
+        new ConnectBT(deviceHardwareAddress).execute();
         if(!isConnected){
             msg("Failed to connect. Please make sure you are around the locker!");
             return;
         }
         if(sendSignal("1")) {
-            int position = devicesIdList.indexOf(deviceIdToUnlock);
+            int position = devicesIdList.indexOf(lockerName);
             devicesIdList.remove(position);
-            LitePal.deleteAll(Device.class, "deviceId = ?", deviceIdToUnlock);
+            LitePal.deleteAll(Device.class, "deviceId = ?", lockerName);
             adapter.notifyItemRemoved(position);
+            Disconnect();
         }
         else{
             msg("fail to open locker!");

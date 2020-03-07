@@ -1,8 +1,8 @@
 package com.example.myapplication;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
-import java.util.regex.*;
 
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -27,8 +27,6 @@ import com.example.myapplication.database.Device;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import static android.app.Activity.RESULT_OK;
-
 public class LockFragment extends Fragment implements View.OnClickListener {
 
     private ImageButton scanQRcodeToLock;
@@ -40,6 +38,8 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     private BluetoothAdapter myBluetooth = null;
 
     private Boolean isConnected = false;
+
+    private String deviceName;
 
     private EditText deviceId;
 
@@ -69,19 +69,15 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.lock_frag_lock_imagebutton:
-
                 //TODO: 检测是否已经匹配了一个设备了
-
-                if(pairLocker() >= 0){
-                    lockDevice(lockerMACAddress);
-                }
+                scanQRcode();
 
                 break;
             case R.id.lock_frag_lock_button:
                 if(!isConnected) {
-                    msg("no paired lockers!");
+                    msg("Please first connect to lockers!");
                 }
-                lockDevice(lockerMACAddress);
+                lockDevice();
                 deviceId.setText("");
                 break;
         }
@@ -89,8 +85,13 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 
 
     //TODO：添加设备
-    private int pairLocker() {
+    private int pairLocker(String lockerName) {
 
+        if(lockerName.isEmpty()){
+            // 扫描失败
+            msg("QRcode is not valid!");
+            return -1;
+        }
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
         if(myBluetooth == null) {
             //设备不支持蓝牙 报错
@@ -100,16 +101,24 @@ public class LockFragment extends Fragment implements View.OnClickListener {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-        scanQRcode();
-        if(lockerMACAddress.isEmpty()){
-            // 扫描失败
-            msg("QRcode is not valid!");
+        Set<BluetoothDevice> pairedDevices = myBluetooth.getBondedDevices();
+        String deviceHardwareAddress = "";
+        if (pairedDevices.size() > 0) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                if(deviceName.equals(lockerName)) {
+                    deviceHardwareAddress = device.getAddress(); // MAC address
+                    break;
+                }
+            }
+        }
+        if(deviceHardwareAddress.isEmpty()){
+            msg("Can't find the device! ");
             return -1;
         }
-        Device device = new Device();
-        device.setDeviceMACaddress(lockerMACAddress);
-        device.save();
-
+        msg("test2");
+        new ConnectBT(deviceHardwareAddress).execute();
         return 0;
     }
 
@@ -131,6 +140,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         if ( btSocket!=null ) {
             try {
                 btSocket.close();
+                isConnected = false;
             } catch(IOException e) {
                 msg("Error");
             }
@@ -140,19 +150,23 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     private class ConnectBT extends AsyncTask<Void, Void, Void> {
         private boolean ConnectSuccess = true;
 
+        private String MACAddress = "";
+
+        public ConnectBT(String MACAddress) {
+            this.MACAddress = MACAddress;
+        }
+
         @Override
         protected  void onPreExecute () {
-            progress = ProgressDialog.show(getContext(), "Connecting...", "Please Wait!!!");
+            msg("connecting");
         }
 
         @Override
         protected Void doInBackground (Void... devices) {
             try {
-                if ( btSocket==null || !isConnected ) {
-                    myBluetooth = BluetoothAdapter.getDefaultAdapter();
-                    BluetoothDevice locker = myBluetooth.getRemoteDevice(lockerMACAddress);
+                if ( btSocket==null && !isConnected ) {
+                    BluetoothDevice locker = myBluetooth.getRemoteDevice(MACAddress);
                     btSocket = locker.createInsecureRfcommSocketToServiceRecord(myUUID);
-                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     btSocket.connect();
                 }
             } catch (IOException e) {
@@ -173,24 +187,19 @@ public class LockFragment extends Fragment implements View.OnClickListener {
                 isConnected = true;
             }
 
-            progress.dismiss();
         }
     }
 
 
 
     //关锁函数先请求后将对应的设备ID保存到本地数据库
-    private void lockDevice(String deviceMACAddress) {
-        if (deviceAvailable(deviceMACAddress) && isConnected) {
-            new ConnectBT().execute();
-            if(!isConnected){
-                msg("Fail to open locker!");
-                return; //连接失败
-            }
-            sendSignal("2");
-            msg("Close locker!");
-            Disconnect();
-        }
+    private void lockDevice() {
+        sendSignal("2");
+        Device device = new Device();
+        device.setDeviceName(deviceName);
+        device.save();
+        msg("Close locker!");
+        Disconnect();
     }
 
     //TODO：扫码开锁逻辑
@@ -217,16 +226,18 @@ public class LockFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 //TODO:解析并发送请求
-                String macAddress = result.getContents();
+                String lockerName = result.getContents();
                 // Not a valid mac address
-                if(!Pattern.matches("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$",macAddress.toLowerCase())) {
+                if(BluetoothAdapter.checkBluetoothAddress(lockerName)) {
                     Toast.makeText(getContext(),"QR code is not valid", Toast.LENGTH_LONG).show();
                     return;
                 }
-                lockerMACAddress = macAddress;
 
                 Toast.makeText(getContext(), "Scanned: " + result.getContents(),
                         Toast.LENGTH_LONG).show();
+
+                deviceName = lockerName;
+                pairLocker(lockerName);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
