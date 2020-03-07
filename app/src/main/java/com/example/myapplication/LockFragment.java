@@ -31,8 +31,6 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 
     private ImageButton scanQRcodeToLock;
 
-    private ProgressDialog progress;
-
     private BluetoothSocket btSocket = null;
 
     private BluetoothAdapter myBluetooth = null;
@@ -47,6 +45,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_ENABLE_BT = 2;
 
+    // The UUID of HC05
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private String lockerMACAddress = "";
@@ -83,8 +82,6 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
-    //TODO：添加设备
     private int pairLocker(String lockerName) {
 
         if(lockerName.isEmpty()){
@@ -157,7 +154,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         }
 
         @Override
-        protected  void onPreExecute () {
+        protected void onPreExecute () {
             msg("connecting");
         }
 
@@ -202,7 +199,6 @@ public class LockFragment extends Fragment implements View.OnClickListener {
         Disconnect();
     }
 
-    //TODO：扫码开锁逻辑
     private void scanQRcode() {
         IntentIntegrator integrator = IntentIntegrator.forSupportFragment(this);
         integrator.setOrientationLocked(false);
@@ -212,12 +208,6 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 //        device.save();
     }
 
-    //TODO：检查设备是否可用
-    private boolean deviceAvailable(String deviceIdToUnlock) {
-        return true;
-    }
-
-    //TODO：扫码结果处理逻辑
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -225,7 +215,6 @@ public class LockFragment extends Fragment implements View.OnClickListener {
             if (result.getContents() == null) {
                 Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
             } else {
-                //TODO:解析并发送请求
                 String lockerName = result.getContents();
                 // Not a valid mac address
                 if(BluetoothAdapter.checkBluetoothAddress(lockerName)) {

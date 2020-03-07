@@ -38,6 +38,8 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
 
     private ProgressDialog progress;
 
+    private String curDeviceName;
+
     private BluetoothSocket btSocket = null;
 
     private BluetoothAdapter myBluetooth;
@@ -86,7 +88,8 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
         dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                unlockDevice(deviceIdToUnlock);
+                curDeviceName = deviceIdToUnlock;
+                pairDevice(deviceIdToUnlock);
             }
         });
         dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
@@ -97,10 +100,7 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
         dialog.show();
     }
 
-    //TODO：开锁逻辑，先开锁，后将本地数据库内的对应的设备删除
-    private void unlockDevice(String lockerName) {
-
-        //TODO:向服务器发送开锁请求
+    private void pairDevice(String lockerName){
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
         if(myBluetooth == null) {
             //设备不支持蓝牙 报错
@@ -127,14 +127,20 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
             return;
         }
         new ConnectBT(deviceHardwareAddress).execute();
+    }
+
+    private void unlockDevice() {
+
+        //TODO:向服务器发送开锁请求
+
         if(!isConnected){
             msg("Failed to connect. Please make sure you are around the locker!");
             return;
         }
         if(sendSignal("1")) {
-            int position = devicesIdList.indexOf(lockerName);
+            int position = devicesIdList.indexOf(curDeviceName);
             devicesIdList.remove(position);
-            LitePal.deleteAll(Device.class, "deviceId = ?", lockerName);
+            LitePal.deleteAll(Device.class, "deviceId = ?", curDeviceName);
             adapter.notifyItemRemoved(position);
             Disconnect();
         }
@@ -163,6 +169,7 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
         if ( btSocket!=null ) {
             try {
                 btSocket.close();
+                isConnected = false;
             } catch(IOException e) {
                 msg("Error");
             }
@@ -170,29 +177,25 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
     }
 
     private class ConnectBT extends AsyncTask<Void, Void, Void> {
-
-
         private boolean ConnectSuccess = true;
 
-        private String lockerMACAddress = "";
+        private String MACAddress = "";
 
-        @Override
-        protected  void onPreExecute () {
-            progress = ProgressDialog.show(getContext(), "Connecting...", "Please Wait!!!");
+        public ConnectBT(String MACAddress) {
+            this.MACAddress = MACAddress;
         }
 
-        public ConnectBT(String lockerMACAddress) {
-            this.lockerMACAddress = lockerMACAddress;
+        @Override
+        protected void onPreExecute () {
+            msg("connecting");
         }
 
         @Override
         protected Void doInBackground (Void... devices) {
             try {
-                if ( btSocket==null || !isConnected ) {
-                    BluetoothAdapter myBluetooth = BluetoothAdapter.getDefaultAdapter();
-                    BluetoothDevice locker = myBluetooth.getRemoteDevice(lockerMACAddress);
+                if ( btSocket==null && !isConnected ) {
+                    BluetoothDevice locker = myBluetooth.getRemoteDevice(MACAddress);
                     btSocket = locker.createInsecureRfcommSocketToServiceRecord(myUUID);
-                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     btSocket.connect();
                 }
             } catch (IOException e) {
@@ -211,9 +214,9 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.OnItemSwi
             } else {
                 msg("Connected");
                 isConnected = true;
+                unlockDevice();
             }
 
-            progress.dismiss();
         }
     }
 }
