@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimary">#2998ff</color>
 <!--    <color name="colorPrimaryDark">#3F51B5</color>-->
-    <color name="colorPrimaryDark">#2196F3</color>
+    <color name="colorPrimaryDark">#5643fa</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="bottomNavItemSelected">#2196F3</color>
+    <color name="colorSecondary">#ffb900</color>
+    <color name="colorSecondaryDark">#ff7730</color>
+    <color name="colorTertiary">#55c57a</color>
+    <color name="colorEditText">#0056d3</color>
+    <color name="bottomNavItemSelected">#2998ff</color>
     <color name="bottomNavItemUnselected">#9e9e9e</color>
     <color name="windowBackground">#fafafa</color>
     <color name="bottomNavBackground">#e0e0e0</color>
+    <color name="colorGrey_1">#777</color>
+    <color name="colorGrey_2">#999</color>
+    <color name="colorGrey_3">#333</color>
 </resources>

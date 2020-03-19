@@ -13,7 +13,9 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapplication.database.Device;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements LockFragment.OnLo
     private NavigationView navigationView;
 
     private BottomNavigationView bottomNavigationView;
+
+    private TextView usernameText;
 
     private String runningDeviceMACAddress;
 
@@ -62,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements LockFragment.OnLo
         navigationView = findViewById(R.id.navigation_view_drawer);
         bottomNavigationView = findViewById(R.id.bottom_navigation_view);
         toolbarTitle = findViewById(R.id.toolbar_title);
+        usernameText = navigationView.getHeaderView(0).findViewById(R.id.username);
+        usernameText.setText(getIntent().getStringExtra("USERNAME"));
         //设置toobar
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
