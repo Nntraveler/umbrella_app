@@ -132,7 +132,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     private Boolean sendSignal ( String number ) {
         if ( btSocket != null ) {
             try {
-                btSocket.getOutputStream().write(number.toString().getBytes());
+                btSocket.getOutputStream().write(number.getBytes());
 
             } catch (IOException e) {
                 msg("Send signal Error");
@@ -210,7 +210,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     private void lockDevice() {
         if (deviceName == null || deviceName.isEmpty())
             return;
-        if(sendSignal("2")) {
+        if(sendSignal("101X")) {
             SharedPreferences.Editor editor = mainActivity.getSharedPreferences("device", Context.MODE_PRIVATE).edit();
             editor.putString("RUNNING_DEVICE_MAC_ADDRESS", deviceName);
             editor.apply();
