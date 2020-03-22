@@ -42,7 +42,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     private Boolean isConnected = false;
 
     private String deviceName;
-
+    private ProgressDialog progress;
     private TextView deviceId;
 
     private Button lockButton;
@@ -125,19 +125,22 @@ public class LockFragment extends Fragment implements View.OnClickListener {
             msg("Can't find the device! ");
             return -1;
         }
-        msg("test2");
         new ConnectBT(deviceHardwareAddress).execute();
         return 0;
     }
 
-    private void sendSignal ( String number ) {
+    private Boolean sendSignal ( String number ) {
         if ( btSocket != null ) {
             try {
                 btSocket.getOutputStream().write(number.toString().getBytes());
+
             } catch (IOException e) {
-                msg("Error");
+                msg("Send signal Error");
+                return false;
             }
+            return true;
         }
+        return false;
     }
 
     private void msg (String s) {
@@ -166,7 +169,8 @@ public class LockFragment extends Fragment implements View.OnClickListener {
 
         @Override
         protected void onPreExecute () {
-            msg("connecting");
+
+            progress = ProgressDialog.show(getContext(), "Connecting...", "Please Wait!!!");
         }
 
         @Override
@@ -194,7 +198,7 @@ public class LockFragment extends Fragment implements View.OnClickListener {
                 msg("Connected");
                 isConnected = true;
             }
-
+            progress.dismiss();
         }
     }
 
@@ -206,13 +210,14 @@ public class LockFragment extends Fragment implements View.OnClickListener {
     private void lockDevice() {
         if (deviceName == null || deviceName.isEmpty())
             return;
-        sendSignal("2");
-        SharedPreferences.Editor editor = mainActivity.getSharedPreferences("device", Context.MODE_PRIVATE).edit();
-        editor.putString("RUNNING_DEVICE_MAC_ADDRESS", deviceName);
-        editor.apply();
-        msg("Close locker!");
-        Disconnect();
-        mainActivity.onLockDeviceButtonClicked(deviceName);
+        if(sendSignal("2")) {
+            SharedPreferences.Editor editor = mainActivity.getSharedPreferences("device", Context.MODE_PRIVATE).edit();
+            editor.putString("RUNNING_DEVICE_MAC_ADDRESS", deviceName);
+            editor.apply();
+            msg("Close locker!");
+            Disconnect();
+            mainActivity.onLockDeviceButtonClicked(deviceName);
+        }
     }
 
     private void scanQRcode() {
@@ -237,9 +242,6 @@ public class LockFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(),"QR code is not valid", Toast.LENGTH_LONG).show();
                     return;
                 }
-
-                Toast.makeText(getContext(), "Scanned: " + result.getContents(),
-                        Toast.LENGTH_LONG).show();
 
                 deviceName = lockerName;
                 pairLocker(lockerName);

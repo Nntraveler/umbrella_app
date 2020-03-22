@@ -119,6 +119,7 @@ public class DevicesFragment extends Fragment {
         dialog.show();
     }
 
+    // 连接设备
     private void pairDevice(String lockerName){
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
         if(myBluetooth == null) {
@@ -176,7 +177,7 @@ public class DevicesFragment extends Fragment {
             try {
                 btSocket.getOutputStream().write(number.toString().getBytes());
             } catch (IOException e) {
-                msg("Error");
+                msg("Send signal Error");
                 return false;
             }
             return true;
