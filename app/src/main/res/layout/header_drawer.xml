@@ -14,21 +14,12 @@
         android:src="@drawable/nav_icon" />
 
     <TextView
-        android:id="@+id/email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/text_email"
-        android:textColor="@color/windowBackground"
-        android:textSize="16sp" />
-
-    <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/email"
-        android:textSize="16sp"
+        android:layout_alignParentBottom="true"
+        android:text="@string/text_username"
         android:textColor="@color/windowBackground"
-        android:text="@string/text_username" />
+        android:textSize="16sp" />
 
 </RelativeLayout>

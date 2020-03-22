@@ -15,4 +15,14 @@
         <item name="android:windowIsTranslucent">false</item>
     </style>
 
+    android:colorControlNormal="@color/colorGrey_3"
+    android:colorControlActivated="@color/colorPrimary"
+
+    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
+
+        <item name="colorControlNormal">@color/colorGrey_3</item>
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+
+    </style>
+
 </resources>
