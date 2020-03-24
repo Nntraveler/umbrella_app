@@ -1,9 +1,11 @@
 package com.example.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.AppCompatCheckBox;
@@ -27,6 +29,10 @@ public class LoginFragment extends Fragment {
 
     public static final int INVALID_PASSWORD = 0;
 
+    public static final int CONNECTION_FAIL = 4;
+
+    private Boolean isConnected = false;
+
     private Button loginButton;
 
     private Button signUpLink;
@@ -38,6 +44,10 @@ public class LoginFragment extends Fragment {
     private AppCompatCheckBox autoLoginCheckbox;
 
     private LoginActivity loginActivity;
+
+    private Communicator communicator = new Communicator();
+
+    private ProgressDialog progress;
 
     public static interface OnSignUpLinkClickListener {
         public void onSignUpLinkClick();
@@ -52,6 +62,15 @@ public class LoginFragment extends Fragment {
         if (username.isEmpty()) {
             return INVALID_ACCOUNT;
         } else if (password.isEmpty()) {
+            return INVALID_PASSWORD;
+        }
+        if(isConnected || communicator.connect()){
+            isConnected = true;
+        }
+        if(!isConnected){
+            return CONNECTION_FAIL;
+        }
+        if(!communicator.signIn(username,password)){
             return INVALID_PASSWORD;
         }
 
@@ -84,6 +103,10 @@ public class LoginFragment extends Fragment {
                     switch (checkAccount(username.trim(), password.trim())) {
                         case SUCCEED:
                             login(username, password);
+                            if(isConnected){
+                                communicator.close();
+                                isConnected = false;
+                            }
                             break;
                         case INVALID_ACCOUNT:
                             usernameEditText.setError("账号不存在");
@@ -91,7 +114,11 @@ public class LoginFragment extends Fragment {
                         case INVALID_PASSWORD:
                             passwordEditText.setError("密码错误");
                             break;
+                        case CONNECTION_FAIL:
+                            usernameEditText.setError("网络连接失败");
+                            break;
                     }
+
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
@@ -118,4 +145,5 @@ public class LoginFragment extends Fragment {
         }
         loginActivity.startMainActivity(username);
     }
+
 }

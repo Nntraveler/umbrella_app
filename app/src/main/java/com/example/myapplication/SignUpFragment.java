@@ -1,11 +1,15 @@
 package com.example.myapplication;
 
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
+
+import java.io.IOException;
 
 
 public class SignUpFragment extends Fragment {
@@ -25,17 +31,25 @@ public class SignUpFragment extends Fragment {
 
     public static final int SUCCEED = 3;
 
+    public static final int CONNECTION_FAIL = 4;
+
+    public Boolean isConnected = false;
+
     private MaterialEditText usernameEditText;
 
     private MaterialEditText passwordEditText;
 
     private MaterialEditText confirmPasswordEditText;
 
+    private ProgressDialog progress;
+
     private Button signUpButton;
 
     private Button loginLink;
 
     private LoginActivity loginActivity;
+
+    private Communicator communicator = new Communicator();
 
     public static interface OnLoginLinkClickListener {
         public void onLoginLinkClick();
@@ -44,6 +58,8 @@ public class SignUpFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy=new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
     }
 
     private int checkInput(String username, String password, String confirmPassword) {
@@ -54,7 +70,23 @@ public class SignUpFragment extends Fragment {
         } else if (!confirmPassword.equals(password)) {
             return INVALID_CONFIRM_PASSWORD;
         }
-
+        if(communicator.connect()){
+            isConnected = true;
+        }
+        if(!isConnected){
+            return CONNECTION_FAIL;
+        }
+        try {
+            if(communicator.checkUserName(username)){
+                return INVALID_ACCOUNT;
+            }
+        }
+        catch (Exception e){
+            return CONNECTION_FAIL;
+        }
+        if(!communicator.signUp(username, password)){
+            return INVALID_PASSWORD;
+        }
         //TODO:检查账号是否已经存在，若存在返回 INVALID_ACCOUNT，否则返回SUCCEED。
 
         return SUCCEED;
@@ -85,7 +117,7 @@ public class SignUpFragment extends Fragment {
 
                     switch (checkInput(username.trim(), password.trim(), confirmPassword.trim())) {
                         case INVALID_ACCOUNT:
-                            usernameEditText.setError("账号无效");
+                            usernameEditText.setError("账号无效或已被注册");
                             break;
                         case INVALID_PASSWORD:
                             passwordEditText.setError("密码无效");
@@ -94,7 +126,14 @@ public class SignUpFragment extends Fragment {
                             confirmPasswordEditText.setError("确认密码需与密码一致");
                             break;
                         case SUCCEED:
+                            if(isConnected){
+                                communicator.close();
+                                isConnected = false;
+                            }
                             loginActivity.onLoginLinkClick();
+                            break;
+                        case CONNECTION_FAIL:
+                            usernameEditText.setError("网络连接失败");
                             break;
                     }
                 } catch (NullPointerException e) {
@@ -112,4 +151,6 @@ public class SignUpFragment extends Fragment {
 
         return view;
     }
+
+
 }
