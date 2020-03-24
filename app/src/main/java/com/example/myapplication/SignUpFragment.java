@@ -87,6 +87,8 @@ public class SignUpFragment extends Fragment {
         if(!communicator.signUp(username, password)){
             return INVALID_PASSWORD;
         }
+
+
         //TODO:检查账号是否已经存在，若存在返回 INVALID_ACCOUNT，否则返回SUCCEED。
 
         return SUCCEED;

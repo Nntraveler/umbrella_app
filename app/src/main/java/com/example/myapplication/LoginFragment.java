@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
+import com.example.myapplication.comunicator.Comunicator;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 
@@ -31,6 +33,11 @@ public class LoginFragment extends Fragment {
 
     public static final int CONNECTION_FAIL = 4;
 
+<<<<<<< HEAD
+=======
+    private Comunicator comunicator = new Comunicator();
+
+>>>>>>> a6d4cebec84292f3680679dad6b50afffb3ebf85
     private Boolean isConnected = false;
 
     private Button loginButton;
@@ -74,6 +81,15 @@ public class LoginFragment extends Fragment {
             return INVALID_PASSWORD;
         }
 
+        if(isConnected || comunicator.connect()){
+            isConnected = true;
+            if(!comunicator.signIn(username, password)){
+                return INVALID_PASSWORD;
+            }
+        }
+        else{
+            return CONNECTION_FAIL;
+        }
         //TODO：检查账号是否存在，密码是否正确。若账号不存在返回 INVALID_ACCOUNT，若密码不正确，返回 INVALID_PASSWORD, 否则返回SUCCEED
 
         return SUCCEED;
@@ -117,6 +133,13 @@ public class LoginFragment extends Fragment {
                         case CONNECTION_FAIL:
                             usernameEditText.setError("网络连接失败");
                             break;
+<<<<<<< HEAD
+=======
+                    }
+                    if(isConnected){
+                        comunicator.close();
+                        isConnected = false;
+>>>>>>> a6d4cebec84292f3680679dad6b50afffb3ebf85
                     }
 
                 } catch (NullPointerException e) {
