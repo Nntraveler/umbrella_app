@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyApplication</string>
+    <string name="app_name">EUmbrella</string>
     <string name="text_email">邮箱</string>
     <string name="text_username">用户名</string>
     <string name="nav_item_text_location">location</string>

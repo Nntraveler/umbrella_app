@@ -119,6 +119,7 @@ public class DevicesFragment extends Fragment {
         dialog.show();
     }
 
+    // 连接设备
     private void pairDevice(String lockerName){
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
         if(myBluetooth == null) {
@@ -156,7 +157,7 @@ public class DevicesFragment extends Fragment {
             msg("Failed to connect. Please make sure you are around the locker!");
             return;
         }
-        if(sendSignal("1")) {
+        if(sendSignal("102X")) {
 //            int position = devicesIdList.indexOf(curDeviceName);
 //            devicesIdList.remove(position);
 //            LitePal.deleteAll(Device.class, "deviceId = ?", curDeviceName);
@@ -174,9 +175,9 @@ public class DevicesFragment extends Fragment {
     private Boolean sendSignal ( String number ) {
         if ( btSocket != null ) {
             try {
-                btSocket.getOutputStream().write(number.toString().getBytes());
+                btSocket.getOutputStream().write(number.getBytes());
             } catch (IOException e) {
-                msg("Error");
+                msg("Send signal Error");
                 return false;
             }
             return true;
