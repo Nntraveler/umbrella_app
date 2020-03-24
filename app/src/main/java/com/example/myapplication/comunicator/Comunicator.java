@@ -1,4 +1,4 @@
-package comunicator;
+package com.example.myapplication.comunicator;
 import redis.clients.jedis.Jedis;
 
 public class Comunicator {

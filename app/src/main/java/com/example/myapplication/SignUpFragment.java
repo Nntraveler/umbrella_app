@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import com.example.myapplication.comunicator.Comunicator;
+
 
 public class SignUpFragment extends Fragment {
 
@@ -24,6 +26,10 @@ public class SignUpFragment extends Fragment {
     public static final int INVALID_CONFIRM_PASSWORD = 2;
 
     public static final int SUCCEED = 3;
+
+    public static final int CONNECTION_FAIL = 4;
+
+    public Boolean isConnected = false;
 
     private MaterialEditText usernameEditText;
 
@@ -36,6 +42,8 @@ public class SignUpFragment extends Fragment {
     private Button loginLink;
 
     private LoginActivity loginActivity;
+
+    private Comunicator comunicator = new Comunicator();
 
     public static interface OnLoginLinkClickListener {
         public void onLoginLinkClick();
@@ -53,6 +61,16 @@ public class SignUpFragment extends Fragment {
             return INVALID_PASSWORD;
         } else if (!confirmPassword.equals(password)) {
             return INVALID_CONFIRM_PASSWORD;
+        }
+
+        if(comunicator.connect()){
+            isConnected = true;
+            if(!comunicator.checkUserName(username)){
+                return INVALID_ACCOUNT;
+            }
+        }
+        else{
+            return CONNECTION_FAIL;
         }
 
         //TODO:检查账号是否已经存在，若存在返回 INVALID_ACCOUNT，否则返回SUCCEED。
@@ -85,7 +103,7 @@ public class SignUpFragment extends Fragment {
 
                     switch (checkInput(username.trim(), password.trim(), confirmPassword.trim())) {
                         case INVALID_ACCOUNT:
-                            usernameEditText.setError("账号无效");
+                            usernameEditText.setError("账号无效或已被注册");
                             break;
                         case INVALID_PASSWORD:
                             passwordEditText.setError("密码无效");
@@ -94,8 +112,16 @@ public class SignUpFragment extends Fragment {
                             confirmPasswordEditText.setError("确认密码需与密码一致");
                             break;
                         case SUCCEED:
+                            comunicator.signUp(username, password);
                             loginActivity.onLoginLinkClick();
                             break;
+                        case CONNECTION_FAIL:
+                            usernameEditText.setError("网络连接失败");
+                            break;
+                    }
+                    if(isConnected) {
+                        comunicator.close();
+                        isConnected = false;
                     }
                 } catch (NullPointerException e) {
                     e.printStackTrace();
