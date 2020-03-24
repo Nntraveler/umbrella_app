@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -85,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements LockFragment.OnLo
                     Intent intent = new Intent(MainActivity.this, ChooseAreaActivity.class);
                     startActivity(intent);
                     return true;
+                } else if (menuItem.getItemId() == R.id.nav_item_logout) {
+                    logout();
                 }
                 drawerLayout.closeDrawers();
                 menuItem.setChecked(false);
@@ -116,6 +120,17 @@ public class MainActivity extends AppCompatActivity implements LockFragment.OnLo
         bottomNavigationView.getMenu().getItem(0).setChecked(true);
         toolbarTitle.setText("天气");
         replaceFragment(new WeatherFragment());
+    }
+
+    private void logout() {
+        SharedPreferences.Editor editor = getSharedPreferences("user", Context.MODE_PRIVATE).edit();
+        editor.putBoolean("AUTO_LOGIN", false);
+        editor.putString("USERNAME", null);
+        editor.putString("PASSWORD", null);
+        editor.apply();
+
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 
     private boolean checkDeviceInUse() {
